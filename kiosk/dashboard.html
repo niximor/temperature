@@ -1,0 +1,80 @@
+ <!DOCTYPE html>
+ <html>
+	<head>
+		<title>Dashboard</title>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+		<script type="text/javascript">
+			var pages = {
+				"temperature": "index.php",
+				"clock": "clock.html"
+			};
+			var pagesLoaded = 0;
+			var keys = [];
+			for (var i in pages) {
+				keys.push(i);
+			}
+
+			$(function(){
+				var switchPage = function(){
+					var previous = false;
+
+					if (!window.currentPage) {
+						window.currentPage = keys[0];
+					} else {
+						var index = (keys.indexOf(window.currentPage) + 1) % keys.length;
+						previous = $(document.getElementById(window.currentPage));
+						window.currentPage = keys[index];
+					}
+
+					var page = $(document.getElementById(window.currentPage));
+
+					if (previous) {
+						if (previous.attr("id") != page.attr("id")) {
+							previous.css("z-index", "1");
+							page
+								.css("z-index", "2")
+								.show();
+
+							previous
+								.hide();
+						}
+					} else {
+						page.show();
+					}
+				}
+
+				$("#loader").html("Loading (0/" + keys.length + ")...");
+
+				// Load all pages and place them to document.
+				for (var id in pages) {
+					var url = pages[id];
+					
+					var target = $("<iframe></iframe>")
+						.attr("id", id)
+						.attr("class", "page")
+						.appendTo(document.body)
+						.css("z-index", 0)
+						.load(function(){
+							$(this).hide();
+							pagesLoaded++;
+							if (pagesLoaded == keys.length) {
+								$("#loader").hide();
+								window.setInterval(switchPage, 30000);
+								switchPage();
+							} else {
+								$("#loader").html("Loading (" + pagesLoaded + "/" + keys.length + ")...");
+							}
+						})
+						.attr("src", url + "?rnd=" + Math.random());
+				}
+			});
+		</script>
+		<style type="text/css">
+			html, body, .page { width: 100%; height: 100%; margin: 0; padding: 0; }
+			.page { position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: auto; border: none; }
+			#loader { position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; z-index: 5; }
+		</style>
+	</head>
+	
+	<body><div id="loader">Loading...</div></body>
+ </html>

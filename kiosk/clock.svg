@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" id="clock">
+	<defs>
+		<!-- Hour clockhand -->
+		<polygon id="p1" points="252.5,156 252.5,256 252.5,286 259.5,286 259.5,256 259.5,156" />
+		<!-- Minute clockhand -->
+		<polygon id="p2" points="253.5,141 253.5,256 253.5,301 258.5,301 258.5,256 258.5,141" />
+		<!-- Second clockhand -->
+		<polygon id="p3" points="258,271 257,271 257,256 257,126 255,126 255,256 255,271 254,271 252,321 260,321" />
+		<!-- Linear gradient 1 -->
+		<!-- Radial gradient -->
+		<radialGradient id="f7" cx="258.25" cy="253.75" r="3" gradientUnits="userSpaceOnUse">
+			<stop offset="0" stop-color="#FFFFFF" stop-opacity="0.8" />
+			<stop offset="1" stop-color="#000000" />
+		</radialGradient>
+	</defs>
+	<g id="Hour">
+		<use xlink:href="#p1">
+		</use>
+	</g>
+	<g id="Minute">
+		<use xlink:href="#p2">
+		</use>
+	</g>
+	<g id="Second">
+		<use xlink:href="#p3">
+		</use>
+	</g>
+	<circle fill="url(#f7)" cx="256" cy="256" r="7.5" />
+</svg>
+

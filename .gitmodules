@@ -1,0 +1,9 @@
+[submodule "dashboard/Flotr2"]
+	path = dashboard/Flotr2
+	url = https://github.com/HumbleSoftware/Flotr2.git
+[submodule "kiosk/Flotr2"]
+	path = kiosk/Flotr2
+	url = https://github.com/HumbleSoftware/Flotr2.git
+[submodule "Flotr2"]
+	path = Flotr2
+	url = https://github.com/HumbleSoftware/Flotr2.git
