@@ -3,6 +3,8 @@ var updateData = function(sensor){
 		colors: [ "#4F4D48", "#F2B933" ],
 		xaxis: {
 			mode: "time",
+			timeMode: "local",
+			timeFormat: "%H:%M",
 			color: "white",
 			noTicks: 12,
 		},
@@ -58,38 +60,34 @@ var updateData = function(sensor){
 				$("#" + i + " .value").html(data[i].value);
 				$("#" + i + " .date").html(data[i].date);
 			} else {
-				console.log(data[i]);
 				$("#" + i).html(data[i]);
 			}
 		}
 	});
 
 	$.getJSON("history.php?period=48&sensor=" + sensor, function(data) {
-		var chartData = [];
-		var oldData = [];
-
 		var minTemp = undefined;
 		var maxTemp = undefined;
 
 		for (var i = 0; i < data.current.length; i++) {
-			chartData.push([data.current[i].date * 1000, data.current[i].value]);
+			data.current[i][0] = new Date(data.current[i][0]).getTime();
 
-			if (minTemp == undefined || minTemp > data.current[i].value) {
-				minTemp = parseFloat(data.current[i].value);
+			if (minTemp == undefined || minTemp > data.current[i][1]) {
+				minTemp = parseFloat(data.current[i][1]);
 			}
 
-			if (maxTemp == undefined || maxTemp < data.current[i].value) {
-				maxTemp = parseFloat(data.current[i].value);
+			if (maxTemp == undefined || maxTemp < data.current[i][1]) {
+				maxTemp = parseFloat(data.current[i][1]);
 			}
 		}
 		for (var i = 0; i < data.lastyear.length; i++) {
-			oldData.push([(data.lastyear[i].date + 365*86400) * 1000, data.lastyear[i].value]);
-			if (minTemp == undefined || minTemp > data.lastyear[i].value) {
-				minTemp = parseFloat(data.lastyear[i].value);
+			data.lastyear[i][0] = new Date(data.lastyear[i][0]).getTime() + 365*86400*1000;
+			if (minTemp == undefined || minTemp > data.lastyear[i][1]) {
+				minTemp = parseFloat(data.lastyear[i][1]);
 			}
 
-			if (maxTemp == undefined || maxTemp < data.lastyear[i].value) {
-				maxTemp = parseFloat(data.lastyear[i].value);
+			if (maxTemp == undefined || maxTemp < data.lastyear[i][1]) {
+				maxTemp = parseFloat(data.lastyear[i][1]);
 			}
 
 		}
@@ -106,11 +104,11 @@ var updateData = function(sensor){
 		Flotr.draw(document.getElementById("chart"), [
 			{
 				label: "Last year",
-				data: oldData
+				data: data.lastyear
 			},
 			{
 				label: "Current",
-				data: chartData
+				data: data.current
 			}
 		], options);
 	});
