@@ -14,7 +14,6 @@ $q = mysqli_query($link, "SELECT `date`, ROUND(`value` / 1000, 1) AS `value` FRO
 
 $data = array();
 $utc = new DateTimeZone("UTC");
-$local = new DateTimeZone(date_default_timezone_get());
 while ($a = mysqli_fetch_array($q, MYSQLI_ASSOC)) {
 	$dt = new DateTime($a["date"], $utc);
 	$data[] = array($dt->format("c"), (float)$a["value"]);
