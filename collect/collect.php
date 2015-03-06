@@ -1,5 +1,6 @@
 <?php
 
+chdir(dirname(__FILE__));
 include "../config.php";
 
 $devices = file("/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves");
@@ -15,7 +16,7 @@ foreach ($devices as $device) {
 		$temp = substr($f[1], $off + 2);
 		
 		$link = mysqli_connect($MYSQL_HOST, $MYSQL_USER, $MYSQL_PASSWORD, $MYSQL_DB) or die(mysqli_connect_error());
-		mysqli_query($link, "INSERT INTO `history` (`date`, `value`, `sensor`) SELECT NOW(), ".(int)$temp.", id FROM `sensors` WHERE device = '".$device."'") or die(mysqli_error($link));
+		mysqli_query($link, "INSERT INTO `history` (`date`, `value`, `sensor`) SELECT UTC_TIMESTAMP(), ".(int)$temp.", id FROM `sensors` WHERE device = '".$device."'") or die(mysqli_error($link));
 		mysqli_close($link);
 		echo $device.": OK\n";
 	} else {
