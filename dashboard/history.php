@@ -10,11 +10,14 @@ if ($period > 24*365*2) $period = 24;
 
 $link = mysqli_connect($MYSQL_HOST, $MYSQL_USER, $MYSQL_PASSWORD, $MYSQL_DB);
 
-$q = mysqli_query($link, "SELECT UNIX_TIMESTAMP(`date`) AS `date`, ROUND(`value` / 1000, 1) AS `value` FROM `history` WHERE `date` >= DATE_ADD(NOW(), INTERVAL -".(int)$period." HOUR) AND sensor = ".(int)$sensor." ORDER BY `date` ASC");
+$q = mysqli_query($link, "SELECT `date`, ROUND(`value` / 1000, 1) AS `value` FROM `history` WHERE `date` >= DATE_ADD(UTC_TIMESTAMP(), INTERVAL -".(int)$period." HOUR) AND sensor = ".(int)$sensor." ORDER BY `date` ASC");
 
 $data = array();
+$utc = new DateTimeZone("UTC");
+$local = new DateTimeZone(date_default_timezone_get());
 while ($a = mysqli_fetch_array($q, MYSQLI_ASSOC)) {
-	$data[] = array((int)$a["date"], (float)$a["value"]);
+	$dt = new DateTime($a["date"], $utc);
+	$data[] = array($dt->format("c"), (float)$a["value"]);
 }
 
 mysqli_close($link);

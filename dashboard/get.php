@@ -25,7 +25,7 @@ while ($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
 	$values = &$data[$row["id"]]["values"];
 	$values[] = array(
 		"name" => $DASH_VALUES[$row["value_name"]],
-		"value" => round($row["value"] / 1000, 1),
+		"value" => sprintf("%1.1f", round($row["value"] / 1000, 1)),
 		"date" => date("j.n G:i", $row["date"])
 	);
 }

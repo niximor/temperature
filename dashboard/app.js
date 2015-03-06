@@ -58,6 +58,17 @@ function drawChart(sensor, data) {
 
 	//console.log("min = " + minTemp + "; max = " + maxTemp);
 
+	console.log("before");
+	console.log(data);
+	for (var series in data) {
+		for (var i in data[series]) {
+			var dt = new Date(data[series][i][0]);
+			data[series][i][0] = dt.getTime();
+		}
+	}
+	console.log("after");
+	console.log(data);
+
 	Flotr.draw(container, [{
 		lines: {
 			fill: true
@@ -68,7 +79,7 @@ function drawChart(sensor, data) {
 		shadowSize: 0,
 		xaxis: {
 			mode: 'time',
-			timeUnit: "second",
+			timeMode: "local",
 			color: '#4d4e56',
 		},
 		yaxis: {
