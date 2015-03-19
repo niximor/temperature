@@ -30,6 +30,14 @@ while ($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
 	);
 }
 
+$res = mysqli_query($link, "SELECT id, name FROM sensor_set WHERE id = ".(int)$set_id) or die(mysqli_error($link));
+if ($row = mysqli_fetch_array($res, MYSQLI_ASSOC)) {
+	$setcond = array(
+		"id" => $row["id"],
+		"name" => $row["name"]
+	);
+}
+
 mysqli_close($link);
 
 $order = array_flip(array_values($DASH_VALUES));
@@ -47,4 +55,6 @@ foreach ($data as &$row) {
 }
 
 header("Content-Type: application/json");
-echo json_encode(array_values($data));
+echo json_encode(array_merge($setcond, array(
+	"sensors" => array_values($data)
+)));

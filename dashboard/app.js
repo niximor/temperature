@@ -1,11 +1,29 @@
 var temperatureApp = angular.module('temperatureApp', []);
-temperatureApp.controller('TemperatureCtrl', function($scope, $http, $timeout) {
+
+var parseLocation = function(location) {
+    var pairs = location.substring(1).split("&");
+    var obj = {};
+    var pair;
+    var i;
+
+    for ( i in pairs ) {
+        if ( pairs[i] === "" ) continue;
+
+        pair = pairs[i].split("=");
+        obj[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
+    }
+
+    return obj;
+};
+
+temperatureApp.controller('TemperatureCtrl', function($scope, $http, $timeout, $location) {
 	var chartInterval;
 
 	var update = function(){
-		$http.get("get.php").success(function(data){
-			//console.log("Update");
-			$scope.dashes = data;
+		var set = parseLocation(window.location.search).set;
+		$http.get("get.php" + ((set != undefined)?"?set=" + set:"")).success(function(data){
+			document.title = data.name;
+			$scope.dashes = data.sensors;
 			$timeout(update, 10000);
 
 			if (chartInterval == undefined) {
@@ -17,7 +35,6 @@ temperatureApp.controller('TemperatureCtrl', function($scope, $http, $timeout) {
 	update();
 
 	function requestChartData() {
-		//console.log("Update chart.");
 		for (var i in $scope.dashes) {
 			var dash = $scope.dashes[i];
 			$http.get("history.php?sensor=" + dash.id).success((function(dash){
@@ -58,16 +75,12 @@ function drawChart(sensor, data) {
 
 	//console.log("min = " + minTemp + "; max = " + maxTemp);
 
-	console.log("before");
-	console.log(data);
 	for (var series in data) {
 		for (var i in data[series]) {
 			var dt = new Date(data[series][i][0]);
 			data[series][i][0] = dt.getTime();
 		}
 	}
-	console.log("after");
-	console.log(data);
 
 	Flotr.draw(container, [{
 		lines: {
