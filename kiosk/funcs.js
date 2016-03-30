@@ -69,6 +69,15 @@ var updateData = function(sensor){
 		var minTemp = undefined;
 		var maxTemp = undefined;
 
+        var daysInYear = 365;
+
+        var now = new Date();
+        var year = now.getFullYear();
+
+        if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
+            daysInYear = 366;
+        }
+
 		for (var i = 0; i < data.current.length; i++) {
 			data.current[i][0] = new Date(data.current[i][0]).getTime();
 
@@ -81,7 +90,8 @@ var updateData = function(sensor){
 			}
 		}
 		for (var i = 0; i < data.lastyear.length; i++) {
-			data.lastyear[i][0] = new Date(data.lastyear[i][0]).getTime() + 365*86400*1000;
+			data.lastyear[i][0] = new Date(data.lastyear[i][0]).getTime() + daysInYear*86400*1000;
+
 			if (minTemp == undefined || minTemp > data.lastyear[i][1]) {
 				minTemp = parseFloat(data.lastyear[i][1]);
 			}
