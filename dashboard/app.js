@@ -18,13 +18,19 @@ var parseLocation = function(location) {
 
 temperatureApp.controller('TemperatureCtrl', function($scope, $http, $timeout, $location) {
 	var chartInterval;
+	var updateInterval;
 
 	var update = function(){
 		var set = parseLocation(window.location.search).set;
 		$http.get("get.php" + ((set != undefined)?"?set=" + set:"")).success(function(data){
 			document.title = data.name;
 			$scope.dashes = data.sensors;
-			$timeout(update, 10000);
+
+			if (updateInterval != undefined) {
+				window.clearTimeout(updateInterval);
+			}
+
+			updateInterval = window.setTimeout(update, 10000);
 
 			if (chartInterval == undefined) {
 				requestChartData();
