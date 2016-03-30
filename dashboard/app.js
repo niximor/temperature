@@ -34,6 +34,10 @@ temperatureApp.controller('TemperatureCtrl', function($scope, $http, $timeout, $
 	}
 	update();
 
+	window.addEventListener("focus", function(){
+		update();
+	});
+
 	function requestChartData() {
 		for (var i in $scope.dashes) {
 			var dash = $scope.dashes[i];
