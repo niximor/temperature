@@ -21,3 +21,9 @@ $DEFAULT_SENSOR_ID = 1;
 
 // Default period of chart history. In hours.
 $DEFAULT_HISTORY_PERIOD = 24;
+
+// API configuration
+$API_AUTH_TOKEN = "";  // Authentication token for API
+$API_URL = "";  // URL of API
+$API_CACHE = "/tmp/readings.db3";  // Cache where to store readings that failed to be sent to server.
+
