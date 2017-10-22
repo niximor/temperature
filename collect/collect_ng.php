@@ -46,7 +46,7 @@ if (!empty($API_CACHE) && file_exists($API_CACHE)) {
     }
 
     if ($anything) {
-        $db->exec("TRUNCATE \"readings\"");
+        $db->exec("DELETE FROM \"readings\"");
     }
 
     $db->close();
