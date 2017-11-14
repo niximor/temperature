@@ -63,6 +63,7 @@ $context = stream_context_create(array(
         "ignore_errors" => true,
     ),
 ));
+
 $response = @json_decode(file_get_contents($API_URL, false, $context));
 
 if (isset($response->status) && $response->status == "OK") {
@@ -75,7 +76,7 @@ if (isset($response->status) && $response->status == "OK") {
     if (!empty($readings)) {
         $db = get_sqlite($API_CACHE);
         $db->exec("INSERT INTO \"readings\" (\"device\", \"value\", \"date\") VALUES ".implode(", ", array_map(function($item) use ($db) {
-            return "('".$db->escapeString($item["device"])."', '".$db->escapeString($item["date"])."', '".$db->escapeString($item["date"])."')";
+            return "('".$db->escapeString($item["device"])."', '".$db->escapeString($item["value"])."', '".$db->escapeString($item["date"])."')";
         }, $readings)));
         $db->close();
     }
