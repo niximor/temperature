@@ -33,27 +33,27 @@ function post_parse_data() {
         $data = json_decode(file_get_contents("php://input"));
 
         if (!is_array($data) && !is_object($data)) {
-            throw new Exception("Bad request.", 400);
+            throw new Exception("Bad request. Data is not array nor object.", 400);
         }
 
         if (is_object($data)) {
             if (empty($data->device) || empty($data->value)) {
-                throw new Exception("Bad request.", 400);
+                throw new Exception("Bad request. Missing device in object.", 400);
             }
 
             if (!is_string($data->device)) {
-                throw new Exception("Bad request.", 400);
+                throw new Exception("Bad request. Device in object must be string.", 400);
             }
 
             if (!is_numeric($data->value)) {
-                throw new Exception("Bad request.", 400);
+                throw new Exception("Bad request. Value in object must be number.", 400);
             }
 
             if (isset($data->date)) {
                 try {
                     $data->date = new DateTime($data->date);
                 } catch (Exception $e) {
-                    throw new Exception("Bad request.", 400);
+                    throw new Exception("Bad request. Unable to parse date '".$data->date."': ".$e->getMessage().".", 400);
                 }
             } else {
                 $data->date = new DateTime();
@@ -63,28 +63,30 @@ function post_parse_data() {
         }
 
         if (is_array($data)) {
+            $index = 0;
             foreach ($data as $item) {
-                if (!is_object($item) || empty($item->device) || empty($item->value)) {
-                    throw new Exception("Bad request.", 400);
+                if (!is_object($item) || empty($item->device) || !isset($item->value)) {
+                    throw new Exception("Bad request. Item in array at index ".$index." must be object and device and value must be set. Instead, got ".json_encode($item).".", 400);
                 }
 
                 if (!is_string($item->device)) {
-                    throw new Exception("Bad request.", 400);
+                    throw new Exception("Bad request. Index ".$index.": Device must be string. Instead, got ".json_encode($item->device).".", 400);
                 }
 
                 if (!is_numeric($item->value)) {
-                    throw new Exception("Bad request.", 400);
+                    throw new Exception("Bad request. Index ".$index.": Value must be number. Instead, got ".json_encode($item->value).".", 400);
                 }
 
                 if (isset($item->date)) {
                     try {
                         $item->date = new DateTime($item->date);
                     } catch (Exception $e) {
-                        throw new Exception("Bad request.", 400);
+                        throw new Exception("Bad request. Index ".$index.": Unable to parse date '".$data->date."': ".$e->getMessage().".", 400);
                     }
                 } else {
                     $item->date = new DateTime();
                 }
+                ++$index;
             }
 
             return $data;
@@ -95,7 +97,7 @@ function post_parse_data() {
         if (isset($_REQUEST["device"]) && !empty($_REQUEST["device"])) {
             $item->device = $_POST["device"];
             if (!is_string($item->device)) {
-                throw new Exception("Bad request.", 400);
+                throw new Exception("Bad request. Device must be string.", 400);
             }
         } else {
             throw new Exception("Missing device parameter.", 400);
