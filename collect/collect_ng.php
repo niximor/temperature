@@ -10,6 +10,9 @@ foreach ((array)$devices as $device) {
     if (empty($device)) continue;
 
     $sensor = "/sys/bus/w1/devices/".$device."/w1_slave";
+    if (!file_exists($sensor)) {
+	    continue;
+    }
     $f = file($sensor);
 
     if (strpos($f[0], "YES") !== false) {
@@ -52,26 +55,36 @@ if (!empty($API_CACHE) && file_exists($API_CACHE)) {
     $db->close();
 }
 
-$context = stream_context_create(array(
-    "http" => array(
-        "method" => "POST",
-        "header" => array(
-            "X-Auth-Token: ".$API_AUTH_TOKEN,
-            "Content-Type: application/json"
-        ),
-        "content" => json_encode($readings),
-        "ignore_errors" => true,
-    ),
-));
+$data = json_encode($readings);
 
-$response = @json_decode(file_get_contents($API_URL, false, $context));
+$curl = curl_init($API_URL);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+curl_setopt($curl, CURLOPT_HTTPHEADER, [
+	"X-Auth-Token: ".$API_AUTH_TOKEN,
+	"Content-Type: application/json",
+	"Content-Length ".strlen($data),
+]);
+$response = @curl_exec($curl);
 
-if (isset($response->status) && $response->status == "OK") {
+if ($response !== false) {
+    $json = json_decode($response);
+    if ($json) {
+        $response = $json;
+    }
+} else {
+    $response = curl_error($curl)." (".curl_errno($curl).")";
+}
+
+curl_close($curl);
+
+if (is_object($response) && isset($response->status) && $response->status == "OK") {
     echo "OK\n";
     echo "inserted=".$response->inserted."\n";
     echo "skipped=".$response->skipped."\n";
 } else {
-    echo "ERROR: ".$response->message."\n";
+    fwrite(STDERR, "ERROR: ".json_encode($response)."\n");
 
     if (!empty($readings)) {
         $db = get_sqlite($API_CACHE);
@@ -80,4 +93,5 @@ if (isset($response->status) && $response->status == "OK") {
         }, $readings)));
         $db->close();
     }
+    exit(1);
 }
